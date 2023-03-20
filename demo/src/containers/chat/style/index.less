@@ -4,6 +4,7 @@
 @box-height: 50px;
 
 .@{chat-prefix-cls} {
+	position: relative;
 	display: flex;
 	flex-direction: column;
 	height: 100%;
@@ -49,6 +50,16 @@
 		-webkit-transform: translate3d(0, 0, 0);
 	}
 
+	&-inWriting{
+		position: absolute;
+		left: 16px;
+		bottom: 112px;
+		width: 146px;
+		height: 44px;
+		background: url("../images/typing.gif");
+		background-size: contain;
+	}
+
 	&-footer {
 		// position: absolute;
 		// left: 0;
@@ -74,7 +85,7 @@
 
 	&-send {
 		width: 100%;
-		height: @box-height;
+		height: 100px;
 
 		.ant-input-group-wrapper {
 			display: block;
@@ -94,6 +105,23 @@
 		.ant-input-group-addon {
 			border: 0;
 			background-color: #fff;
+		}
+	}
+	&-chatBot-tips{
+		margin-top: 22px;
+		text-align: center;
+		width: 100%;
+		font-family: 'PingFang SC';
+		font-size: 12px;
+		line-height: 20px;
+		color: #A3A3A3;
+	}
+	&-chatBot-tips-link{
+		color:#0091FF;
+		text-decoration: underline;
+		&:hover{
+			color:#0091FF;
+			text-decoration: underline;
 		}
 	}
 }

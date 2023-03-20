@@ -310,6 +310,16 @@ WebIM.conn.listen({
         let { from, to } = message 
         let { type } = message
         let rootState = store.getState()
+        const byName =  _.get(rootState,['entities','roster','byName']);
+        let botName = "";
+        for(let key in byName){
+            if(byName[key].isChatbot){
+                botName = key
+            }
+        }
+        if(from === botName){
+            store.dispatch(MessageActions.updateWaitingStatus(false));
+        }
         let username = _.get(rootState, 'login.username', '')
         let bySelf = from == username
         // root id: when sent by current user or in group chat, is id of receiver. Otherwise is id of sender

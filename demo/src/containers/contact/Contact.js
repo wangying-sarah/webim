@@ -36,6 +36,7 @@ const Contact = ({ history, match, common, location, contacts, group, chatroom, 
             const info = utils.getLatestMessage(_.get(message, [ chatTypes[chatType], name ], []))
             const count = message.getIn([ 'unread', 'chat', name ], 0)
             items[index] = {
+                isChatbot:userInfos[name]?.isChatbot || false,
                 name,
                 info: userInfos[name]?.info || {},
                 unread: count,

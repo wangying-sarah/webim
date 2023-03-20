@@ -27,6 +27,7 @@ import AddAVMemberModal from '@/components/videoCall/AddAVMemberModal'
 import ModalComponent from '@/components/common/ModalComponent'
 import RecordAudio from '@/components/recorder/index'
 import UserInfoModal from '@/components/contact/UserInfoModal'
+import { store } from '@/redux'
 const rtc = WebIM.rtc;
 const { TextArea } = Input
 const FormItem = Form.Item
@@ -97,6 +98,7 @@ class Chat extends React.Component {
         this.onMenuContactClick = this.onMenuContactClick.bind(this)
 
         this.logger = WebIM.loglevel.getLogger('chat component')
+        this.isChatbot = false;
     }
 
     scollBottom() {
@@ -203,7 +205,7 @@ class Chat extends React.Component {
         if (!value) return
         this.props.sendTxtMessage(chatType[selectTab], selectItem, {
             msg: value
-        })
+        }, this.isChatbot)
         this.emitEmpty()
     }
 
@@ -584,12 +586,10 @@ class Chat extends React.Component {
         } = this.props
         const { selectItem, selectTab } = match.params
         
-
         const back = () => {
             const redirectPath = '/' + [ selectTab ].join('/') + location.search
             history.push(redirectPath)
         }
-
         let name = selectItem
         let webrtcButtons = []
         let userinfos = {}
@@ -598,6 +598,7 @@ class Chat extends React.Component {
         if (selectTab === 'contact') {
             let withInfoUsers = this.props.entities.roster.byName
             userinfos  = name = withInfoUsers ? withInfoUsers[selectItem]?.info?.nickname || name: name
+            this.isChatbot = withInfoUsers?  withInfoUsers[selectItem]?.isChatbot || false : false;
         }
         if (selectTab === 'group') {
             userinfos = this.props.entities.groupMember[selectItem]?.byName || {}
@@ -662,6 +663,7 @@ class Chat extends React.Component {
                 </div>
             )
         }
+        const  isWaitingGPTState = store.getState()?.entities?.message?.isWaitingGPT || false;
         return (
             <div className="x-chat">
                 <div className="x-list-item x-chat-header">
@@ -684,7 +686,7 @@ class Chat extends React.Component {
                         <span>{name}</span>
                         {isShowDeleteGroupNotice ?<span>该群仅供试用，72小时后将被删除</span>: ''}
                     </div>
-                    <div className="fr">
+                    {!this.isChatbot && <div className="fr">
                         <span style={{ color: '#8798a4', cursor: 'pointer' }}>
                             {selectTab === 'contact' || selectTab === 'stranger'
                                 ? <Dropdown
@@ -696,13 +698,14 @@ class Chat extends React.Component {
                                 </Dropdown>
                                 : <Icon type="ellipsis" onClick={this.handleRightIconClick} />}
                         </span>
-                    </div>
+                    </div>}
                 </div>
                 <div className="x-chat-content-tip">
                     本应用仅用于环信产品功能开发测试，请勿用于非法用途。任何涉及转账、汇款、裸聊、网恋、网购退款、投资理财等统统都是诈骗，请勿相信！
                 </div>
                 <div className="x-chat-content" ref="x-chat-content" onScroll={this.handleScroll}>
                     {/* fixed bug of messageList.map(...) */}
+                    {this.isChatbot && <div className="x-chat-chatBot-tips">本会话基于外部API二次开发，仅供试用AI使用 <a className='x-chat-chatBot-tips-link' href='https://www.easemob.com/protocol/chatbot' target="_blank" rel="noreferrer">查看免责声明</a></div>}
                     {this.state.isLoaded && <div style={{ width: '150px', height: '30px', lineHeight: '30px', backgroundColor: '#888', color: '#fff', borderRadius: '15px', textAlign: 'center', margin: '10px auto' }}>{I18n.t('noMoreMessage')}</div>}
                     {_.map(messageList, (message, i) => {
                         if (i > 0) {
@@ -715,7 +718,7 @@ class Chat extends React.Component {
                     })}
                 </div>
                 <div className="x-chat-footer">
-                    <div className="x-list-item x-chat-ops">
+                    {!this.isChatbot && <div className="x-list-item x-chat-ops">
                         {/* emoji */}
                         <div className="x-chat-ops-icon ib">
                             <ChatEmoji onClick={this.handleEmojiSelect} />
@@ -766,7 +769,7 @@ class Chat extends React.Component {
                         >
                             <Icon type="idcard" style={{padding:'0 15px'}} className="icon iconfont icon-trash"/>
                         </Popover>
-                    </div>
+                    </div>}
                     <div className="x-list-item x-chat-send">
                         <Input
                             value={this.state.value}
@@ -785,6 +788,7 @@ class Chat extends React.Component {
                         {/*<TextArea rows={2} />*/}
                     </div>
                 </div>
+                {isWaitingGPTState && this.isChatbot && <div className="x-chat-inWriting"></div>}
                 {/* <WebRTCModal collapsed={collapsed} visible={showWebRTC} /> */}
                 <ModalComponent
                     closable={false}
@@ -823,7 +827,7 @@ export default connect(
     dispatch => ({
         switchRightSider: ({ rightSiderOffset }) => dispatch(GroupActions.switchRightSider({ rightSiderOffset })),
         setGroupMemberAttr: (resp) => dispatch(GroupActions.setGroupMemberAttr(resp)),
-        sendTxtMessage: (chatType, id, message) => dispatch(MessageActions.sendTxtMessage(chatType, id, message)),
+        sendTxtMessage: (chatType, id, message, isChatbot) => dispatch(MessageActions.sendTxtMessage(chatType, id, message, isChatbot)),
         deleteMessage: (id) => dispatch(MessageActions.deleteMessage(id, true)),
         sendImgMessage: (chatType, id, message, source, callback) => dispatch(MessageActions.sendImgMessage(chatType, id, message, source, callback)),
         sendFileMessage: (chatType, id, message, source, callback) => dispatch(MessageActions.sendFileMessage(chatType, id, message, source, callback)),

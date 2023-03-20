@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Menu, Icon, Badge, Avatar } from 'antd'
 import ContactHead from './ContactHead'
+import botAva from './images/chatbot.png'
 
 const SubMenu = Menu.SubMenu
 const MenuItemGroup = Menu.ItemGroup
@@ -17,8 +18,8 @@ const ContactItem = ({ chatType, items, collapse, hasLogo, ...rest }) => {
             <div className="nav-text">
                 <div>
                     {chatType == 'contact' ? 
-                        <Avatar src={item.info.avatarurl||defaultAvatar} onClick={rest.onClickAvatar}/>:null}
-                    <span style={{ marginLeft: '5px' }}>{item?.info?.nickname || item.name}</span>
+                    <Avatar src={item?.isChatbot ? botAva:(item.info.avatarurl||defaultAvatar)} onClick={(e)=>{e.stopPropagation();rest.onClickAvatar(item.name)}}/>:null}
+                    <span style={{marginLeft: '5px'}}>{item?.info?.nickname || item.name}</span>
                     {/*
                         <Badge
                         count={109}

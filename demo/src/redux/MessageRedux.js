@@ -5,6 +5,8 @@ import WebIM from '@/config/WebIM'
 import { store } from '@/redux'
 import AppDB from '@/utils/AppDB'
 import StrangerActions from '@/redux/StrangerRedux'
+import { message as tips } from 'antd'
+import { I18n } from 'react-redux-i18n'
 
 // roomType true-chatroom | false-group
 // chatType singleChat  | chatRoom- group or chatroom
@@ -206,10 +208,25 @@ const { Types, Creators } = createActions({
     demo: [ 'chatType' ],
     //clearMessage: [ "chatType", "id" ],
     clearUnread: [ "chatType", "id" ],
+    updateWaitingState: ["waitingState"],
+    
     // ---------------async------------------
-    sendTxtMessage: (chatType, chatId, message = {}) => {
+    updateWaitingStatus: (waitingState) => {
+        return (dispatch) => {
+            dispatch(Creators.updateWaitingState(waitingState))
+        }
+    },
+    sendTxtMessage: (chatType, chatId, message = {}, isChatbot) => {
         // console.log('sendTxtMessage', chatType, chatId, message)
         return (dispatch, getState) => {
+            if(_.get(getState(), ['entities','message','isWaitingGPT']) && isChatbot){
+                //没有收到机器人回复消息前又发送新消息
+                tips.warning(I18n.t('youCanSendItLater'))
+                return
+            }
+            if(isChatbot){
+                dispatch(Creators.updateWaitingState(true))
+            }
             const pMessage = parseFromLocal(chatType, chatId, message, 'txt')
             // const pMessage = parseFromLocal(chatType, chatId, message, 'custom')
             const { body, id, to } = pMessage
@@ -624,6 +641,7 @@ export const INITIAL_STATE = Immutable({
     chatroom: {},
     stranger: {},
     extra: {},
+    isWaitingGPT: false,//在等待GPT回复
     unread: {
         chat: {},
         groupchat: {},
@@ -633,6 +651,10 @@ export const INITIAL_STATE = Immutable({
 })
 
 /* ------------- Reducers ------------- */
+export const updateWaitingState = (state, {waitingState}) => {
+    state = state.setIn([ 'isWaitingGPT'], waitingState )
+    return state
+}
 /**
  * add message to store
  * @param state
@@ -861,7 +883,8 @@ export const reducer = createReducer(INITIAL_STATE, {
     [Types.CLEAR_MESSAGE]: clearMessage,
     [Types.CLEAR_UNREAD]: clearUnread,
     [Types.INIT_UNREAD]: initUnread,
-    [Types.FETCH_MESSAGE]: fetchMessage
+    [Types.FETCH_MESSAGE]: fetchMessage,
+    [Types.UPDATE_WAITING_STATE]: updateWaitingState
 })
 
 /* ------------- Selectors ------------- */

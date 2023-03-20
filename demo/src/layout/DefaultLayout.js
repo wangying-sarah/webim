@@ -223,6 +223,7 @@ class DefaultLayout extends Component {
     }
     onClickAvatar(userId){
         let userInfos = this.props.entities.roster.byName || {}
+        if(userInfos[userId]?.isChatbot) return;
         this.userInfo = JSON.parse(JSON.stringify(userInfos[userId].info))
         this.userInfo.userId = userId
         this.setState({
@@ -415,7 +416,7 @@ class DefaultLayout extends Component {
                             left: selectItem && collapsed ? '-100%' : 0
                         }}
                     >
-                        <Contact collapsed={false} onClickAvatar={this.onClickAvatar.bind(this, selectItem)} onClick={this.changeItem} selectedKeys={[ selectItem ]}
+                        <Contact collapsed={false} onClickAvatar={this.onClickAvatar.bind(this)} onClick={this.changeItem} selectedKeys={[ selectItem ]}
                         />
                     </div>
                     <div className="x-layout-video"

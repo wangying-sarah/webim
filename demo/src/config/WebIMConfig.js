@@ -27,12 +27,12 @@ var config = {
      * a1.easemob.com 线上环境
      * a1-hsb.easemob.com 沙箱环境
      */
-    restServer: rest.restServer || (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1.easemob.com',
+    restServer: rest.restServer || (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a41.easemob.com',
     /*
    * Application AppKey
    */
     // easemob-demo#easeim
-    appkey: isSandBox ? 'easemob-demo#easeim' : 'easemob#easeim',
+    appkey: appkey || 'easemob#chatbot',
     /*
    * Application Host
    */

@@ -77,14 +77,16 @@ class AddGroupModal extends React.Component {
 
         const items = []
         const options = []
+        
         roster.friends.forEach((name, index) => {
-            items[index] = {
-                name
+            if(!roster.byName[name].isChatbot){
+                items[index] = {
+                    name
+                }
+    
+                options[index] = { label: name, value: name }
             }
-
-            options[index] = { label: name, value: name }
         })
-
         // const options = [
         // 	{ label: "Apple", value: "Apple" },
         // 	{ label: "Pear", value: "Pear" },

@@ -144,4 +144,5 @@ export const us = {
     confirm: 'Confirm',
     editGroupNickSuccess: 'Edit success',
     editGroupNickFailed: 'Edit failed',
+    youCanSendItLater: 'You can send it later~',
 }

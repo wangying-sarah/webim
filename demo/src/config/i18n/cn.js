@@ -146,4 +146,5 @@ export const cn = {
     confirm: '确认',
     editGroupNickSuccess: '修改我的群昵称成功',
     editGroupNickFailed: '修改我的群昵称失败',
+    youCanSendItLater: '你等会儿再发~',
 }

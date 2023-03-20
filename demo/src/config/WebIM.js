@@ -62,11 +62,11 @@ let options = {
 //     WebIM.config.isSandBox = true
 // }
 if (WebIM.config.isSandBox) {
-    options.url =  WebIM.config.socketServer // (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//im-api-v2-hsb.easemob.com/ws'
-    options.apiUrl = WebIM.config.restServer // (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1-hsb.easemob.com'
+    // options.url =  WebIM.config.socketServer // (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//im-api-v2-hsb.easemob.com/ws'
+    // options.apiUrl = WebIM.config.restServer // (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1-hsb.easemob.com'
     // options.url = `${window.location.protocol}//172.17.2.47:8280/ws`;
     // options.apiUrl = `${window.location.protocol}//172.17.2.47:8080`;
-    options.isHttpDNS = false
+    options.isHttpDNS = true;
     // WebIM.config.restServer = (window.location.protocol === "https:" ? "https:" : "http:") + '//a1-hsb.easemob.com';
 }
 

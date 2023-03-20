@@ -3,8 +3,11 @@ import Immutable from 'seamless-immutable'
 import _ from 'lodash'
 import WebIM from '@/config/WebIM'
 import { I18n } from 'react-redux-i18n'
+import http from "@/utils/axios"
 
 import CommonActions from '@/redux/CommonRedux'
+import MessageActions from '@/redux/MessageRedux'
+import { store } from '@/redux'
 
 /* ------------- Types and Action Creators ------------- */
 const { Types, Creators } = createActions({
@@ -32,8 +35,47 @@ const { Types, Creators } = createActions({
                     }catch(e){
                         console.log('111',e);
                     }finally{
-                        dispatch(Creators.updateRoster(roster))
-                        dispatch(CommonActions.fetched())
+                        http("get", `https://a41.easemob.com/inside/chatGPT/robot/name`).then(res => {
+                            const chatBotInfo = {
+                                name: res.robotName,
+                                subscription: "both",
+                                jid: WebIM.conn.context.jid,
+                                info:{
+                                    nickname:res.robotName,
+                                },
+                                isChatbot: true,
+                            }
+                            const message = {
+                                body:{
+                                    msg: "欢迎试用环信 Chatbot，我将解答您提出的任何问题。请注意，提问上限10次，超过上限后我将不再回答您的问题，请您谅解。",
+                                    type: "txt",
+                                },
+                                bySelf: false,
+                                error: false,
+                                errorCode: "",
+                                errorText:"",
+                                ext: {},
+                                from: res.robotName,
+                                id: WebIM.conn.getUniqueId(),
+                                isUnread: 0,
+                                status: "sent",
+                                time: new Date().getTime(),
+                                to: WebIM.conn.user,
+                                toJid: "",
+                                type: "chat",
+                            }
+                            //插入欢迎语
+                            store.dispatch(MessageActions.fetchMessage(res.robotName, "chat", 0, (res) => {
+                                if(res===0){
+                                    store.dispatch(MessageActions.addMessage(message, 'txt'));
+                                }
+                            }))
+                            roster.unshift(chatBotInfo);
+                            dispatch(Creators.updateRoster(roster))
+                            dispatch(CommonActions.fetched())
+                        }).catch(()=>{
+                            dispatch(CommonActions.fetched())
+                        })
                     }
                 },
                 error: error => {
